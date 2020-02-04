@@ -1,0 +1,32 @@
+* trace4v_wprotect.txt
+* Test write protections (mismatches, faults as specified in comments)
+f01  2  20000
+* Store data in 2nd page, then set it non-writable
+30a  400 20400 02
+ff0  1  20400
+* Make sure 1st page is still writable
+30a  400 20000 01
+* Check values in both pages
+cba  400 20000 01
+cba  400 20400 02
+* Next line should generate a Write Permission Fault on the second byte
+301  203fe ab cd ef fe
+cb1  203fe ab cd 02 02
+4f0  6  203fd
+* Next line should generate a Write Permission Fault
+30A  A  203fb ba
+* Next line should generate 2 mismatches, on first and last bytes
+CBA  7  203fa ba
+4f0  10 203fa
+* Next line should generate a Write Permission Fault
+31D  10  20440  20000
+cba  12  2043f  02
+cba  10  20000  01
+* Set 2nd page writable; following lines should run without faults or errors
+ff1  1  20400
+* Write all bytes of both pages
+30A  800  20000 03
+CBA  800  20000 03
+4f0  10  20000
+4f0  10  207f0
+* end of trace

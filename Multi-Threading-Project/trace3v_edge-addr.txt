@@ -1,0 +1,31 @@
+* trace3v_edge-addr.txt
+* Simple test of access to first/last pages in address space. 
+* No faults or exceptions or mismatches should occur except as noted in comments.
+f01  1  3fc00
+f01  1  00000
+* Make sure allocated pages are cleared to 0
+CBA  400 00000 00
+CBA  400 3fc00 00
+4f0  10  00000
+4f0  10  3fff0
+* Fill entire pages and compare
+30a  400  00000  11
+30a  400  3fc00  22
+cba  400  00000  11
+cba  400  3fc00  22
+* Store some values and compare
+301  3fff0  a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac ad ae af
+CB1  3ffef  22 a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac ad ae af
+* The next line should have 2 compare errors
+CB1  3ffef  22 a0 a1 a2 b3 a4 a5 a6 a7 a8 a9 aa ab ac dd ae af
+* Copy data from low to high page
+31D  3  3fffd 003fd
+CB1  3fffc  ac 11 11 11
+* Copy data from high range to low
+31d  10 003f0 3fff0
+cb1  003f0  a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac 11 11 11
+4f0  10  00000
+4f0  10  003f0
+4f0  10  3fc00
+4f0  10  3fff0
+* end of trace

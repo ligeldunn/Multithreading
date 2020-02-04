@@ -1,0 +1,28 @@
+* trace1v.txt - simple trace file maps 1 page, no faults or exceptions should occur.
+*   Mismatches and other errors should occur only as indicated in the comments.
+*   Print output should exactly match sample output.
+F01  1  3A000
+* Print out start of range (should be all 0)
+4f0  10  3A000
+* Make sure allocated page is cleared to 0 by checking all bytes
+cba  400 3a000 00
+* Fill entire page with different value and check again
+30a  400 3a000 AB
+cba  400 3a000 ab
+4f0  18 3a000
+4f0  10 3a3f0 
+* Store some values and compare
+301  3a201 b1 b2 b3 b4 b5
+301  3a202 c2
+4f0  7 3a200
+CB1  3a200 AB B1 C2 B3 B4 B5 AB
+* Copy bytes, print, and compare
+31D  10  3a180 3a1f8
+4F0  10  3a180
+Cb1  3a1f8 ab ab ab ab ab ab ab ab ab b1 c2 b3 b4 b5 ab
+Cb1  3a180 ab ab ab ab ab ab ab ab ab b1 c2 b3 b4 b5 ab
+* The following should generate a mismatch on the 2nd and 4th bytes
+cb1  3a188 ab c1 c2 c3 b4 b5 ab
+* The following should generate 10 (decimal) errors
+cba  400 3a000 ab
+* end of trace

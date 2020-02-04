@@ -1,0 +1,40 @@
+* trace2v_multi-page.txt
+*   Allocates 2 disjoint groups of pages.  No fault or exceptions should occur.
+*   Mismatches and other errors should occur only as indicated in the comments.
+f01  3  3d400
+* Check pages cleared to 0
+4f0  10  3d400
+4f0  10  3dff0
+cba  c00 3d400 00
+* Fill all 3 pages with preset value
+30a  c00 3d400 42
+cba  c00 3d400 42
+* Store, copy, and check some data
+301  3d7f8  A0  A1  A2  A3  A4  A5  A6  A7  A8  A9  Aa  Ab  Ac  Ad  Ae  Af
+31D  10  3dbf8 3d7f8 10
+CB1  3dbf8  A0  A1  A2  A3  A4  A5  A6  A7  A8  A9  Aa  Ab  Ac  Ad  Ae  Af 
+4f0  12 3dbf7
+* Allocate more pages
+f01  4  0AC00
+* Check pages cleared to 0
+4f0  10 0ac00
+4f0  10 0bbf0
+cba  1000  ac00  00
+* Fill with preset and check
+30A  1000  ac00 EF
+CBA  1000  ac00 EF
+* Copy from original pages to new pages and compare
+31D  c00  ad00  3d400
+cba  100  ac00 ef
+cba  3f8  ad00 42
+CB1  b0f8  A0  A1  A2  A3  A4  A5  A6  A7  A8  A9  Aa  Ab  Ac  Ad  Ae  Af 
+cba  3f0  b108 42
+CB1  b4f8  A0  A1  A2  A3  A4  A5  A6  A7  A8  A9  Aa  Ab  Ac  Ad  Ae  Af 
+cba  3f8  b508 42
+cb1  b8ff 42 ef
+* The following line should generate two mismatches.
+CB1  b4f8  A0  A1  22  A3  A4  A5  A6  A7  A8  A9  Aa  BB  Ac  Ad  Ae  Af 
+* The following two lines should generate two mismatches
+301  ac03  93 EF EF 96
+CBA  10  ac00 EF
+* end of trace
